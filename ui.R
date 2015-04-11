@@ -12,6 +12,7 @@ shinyUI(fluidPage(
       helpText("After the list of checkboxes loads, follow then directions and then move to the next tab.")
     ), #end of sidebarPanel
     mainPanel(tabsetPanel(
+      tabPanel("Regions", uiOutput("Regions")),
       tabPanel("Locations", uiOutput("Locations")),
       tabPanel("Fare", uiOutput("Fares")),
       tabPanel("Beverages", uiOutput("Beverages")),
