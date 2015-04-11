@@ -9,7 +9,7 @@ shinyUI(fluidPage(
         inputId = "url",
         label = "OpenTable Web Address", 
         value = "paste the address here"),
-      helpText("After the list of checkboxes loads, follow then directions and then move to the next tab.")
+      helpText("After the list of checkboxes loads, follow the directions and then move to the next tab.")
     ), #end of sidebarPanel
     mainPanel(tabsetPanel(
       tabPanel("Regions", uiOutput("Regions")),
