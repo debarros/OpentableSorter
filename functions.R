@@ -29,25 +29,32 @@ GetPage = function(url){
   for (i in 1:nrow(y)){
     y$PlaceStart[i] = min(PlaceStart[which(PlaceStart > y$TypeEnd[i])])
     y$PlaceEnd[i] = min(PlaceEnd[which(PlaceEnd > y$PlaceStart[i])])
-  }
+  }  
   
+  ## Get Regions of restaurants
+  RegionStart = unlist(gregexpr(pattern = '<div class="ab-testing-hide">',x2)) + 31
+  RegionEnd = unlist(gregexpr(pattern = '</div>',x2))-1
+  for (i in 1:nrow(y)){
+    y$RegionStart[i] = min(RegionStart[which(RegionStart > y$PlaceEnd[i])])
+    y$RegionEnd[i] = min(RegionEnd[which(RegionEnd > y$RegionStart[i])])
+  }
   ## Get Descriptions of restaurants
   DescStart = unlist(gregexpr(pattern = '<div class="rest-promo-message">',x2))+35
   DescEnds = unlist(gregexpr(pattern = '</div>',x2))-3
   for (i in 1:nrow(y)){
-    y$DescStart[i] = min(DescStart[which(DescStart > y$PlaceEnd[i])])
+    y$DescStart[i] = min(DescStart[which(DescStart > y$RegionEnd[i])])
     y$DescEnd[i] = min(DescEnds[which(DescEnds > y$DescStart[i])])
   }
   
   ## Get text of names, places, types, and descriptions
   y$name = substring(x2,y$NameStart,y$NameEnd)
   y$place = substring(x2,y$PlaceStart,y$PlaceEnd)
+  y$region = substring(x2,y$RegionStart,y$RegionEnd)
   y$type = substring(x2,y$TypeStart,y$TypeEnd)
   y$desc = substring(x2,y$DescStart,y$DescEnd)
   
   #remove unnecessay columns
-  y = y[,c(9:12)]
-  
+  y = y[,c(11:15)]
   #Fix ampersands and other funny characters in restaurant names
   y$name = gsub(pattern = "&amp;", replacement = "&", x = y$name, ignore.case = TRUE)
   y$name = gsub(pattern = "&#233;", replacement = "e", x = y$name, ignore.case = TRUE)
@@ -60,11 +67,19 @@ GetPage = function(url){
 } #end of GetPage function
 
 
-#Remove unacceptable locations
-SubSet1 = function (DiningSet, LocationInput){
-  DiningSet = DiningSet[which(DiningSet$place %in% LocationInput),] #Subset by acceptable locations
+#Remove unacceptable regions
+SubSet0 = function (DiningSet, RegionInput){
+  DiningSet = DiningSet[which(DiningSet$region %in% RegionInput),] #Subset by acceptable regions
   rownames(DiningSet) <- seq(length=nrow(DiningSet)) #Reset rownames  
   return(DiningSet)
+}
+
+
+#Remove unacceptable locations
+SubSet1 = function (DiningSet0, LocationInput){
+  DiningSet0 = DiningSet0[which(DiningSet0$place %in% LocationInput),] #Subset by acceptable locations
+  rownames(DiningSet0) <- seq(length=nrow(DiningSet0)) #Reset rownames  
+  return(DiningSet0)
 }
 
 
