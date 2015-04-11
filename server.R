@@ -9,9 +9,16 @@ shinyServer(function(input, output) {
     } else if (input$url == ""){return()
     } else {GetPage(input$url)})
   
-  DiningSet1 = reactive(
+  
+  DiningSet0 = reactive(
     if(is.null(DiningSet)){return()
-    } else {x = SubSet1(DiningSet(), input$LocationInput)
+    } else {x = SubSet0(DiningSet(), input$RegionInput)
+            return(x)})
+  
+  
+  DiningSet1 = reactive(
+    if(is.null(DiningSet0)){return()
+    } else {x = SubSet1(DiningSet0(), input$LocationInput)
             return(x)})
   
   DiningSet2 = reactive(
@@ -24,16 +31,25 @@ shinyServer(function(input, output) {
     if(is.null(DiningSet2)){return()
     } else {x = SubSet3(DiningSet2(), input$BeverageInput)
             return(x)})
+
+  
+  output$Regions = renderUI(
+    if(is.null(DiningSet())){return()
+    } else checkboxGroupInput(
+      inputId = "RegionInput", 
+      label = "Which Regions do you want to use?", 
+      choices = sort(unique(DiningSet()$region))
+    )
+  )
   
   
   output$Locations = renderUI(
-    if(is.null(DiningSet())){return()
-    } else checkboxGroupInput(
+    if(is.null(DiningSet0())){return()
+    } else {checkboxGroupInput(
       inputId = "LocationInput", 
       label = "Which Locations do you want to use?", 
-      choices = unique(DiningSet()$place), 
-      selected = unique(DiningSet()$place)
-    )
+      choices = sort(unique(DiningSet0()$place))
+    )}
   )
   
   output$Fares = renderUI(
@@ -41,8 +57,9 @@ shinyServer(function(input, output) {
     } else {checkboxGroupInput(
               inputId = "FareInput", 
               label = "Which types of food interest you?", 
-              choices = unique(DiningSet1()$type), 
-              selected = unique(DiningSet1()$type))}
+              choices = sort(unique(DiningSet1()$type))
+              )
+    }
   )
   
   output$Beverages = renderUI(
@@ -54,7 +71,7 @@ shinyServer(function(input, output) {
   )
   
   output$Results = renderTable(
-    expr = DiningSet3()
+    expr = DiningSet3()[order(DiningSet3()$name),]
   )
   
   
